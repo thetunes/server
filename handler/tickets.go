@@ -36,7 +36,7 @@ func GetAllTicket(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "Tickets not found", "data": nil})
 	}
 	// return tickets
-	return c.Status(200).JSON(fiber.Map{"status": "sucess", "message": "Tickets Found", "data": tickets})
+	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "Tickets Found", "data": tickets})
 }
 
 // GetSingleTicket gets a single ticket from the database by ID
