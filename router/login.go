@@ -30,4 +30,13 @@ func SetupUserRoutes(app *fiber.App) {
 	admin.Put("/:id", handler.UpdateAdmin)
 	admin.Delete("/:id", handler.DeleteAdminByID)
 
+	// Note: This is just an example, please use a secure secret key
+	// jwt := middleware.NewAuthMiddleware(config.Config("AUTH_SECRET"))
+
+	// User Group
+	login := api.Group("/auth")
+
+	// Request token
+	login.Post("/", handler.Login)
+
 }

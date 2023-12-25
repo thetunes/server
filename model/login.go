@@ -10,6 +10,15 @@ type Identifiable interface {
 	BeforeCreate(tx *gorm.DB) (err error)
 }
 
+type LoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type LoginResponse struct {
+	Token string `json:"token"`
+}
+
 // Define data struct required for User
 type User struct {
 	gorm.Model
