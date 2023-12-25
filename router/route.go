@@ -2,11 +2,12 @@ package router
 
 import (
 	"api/handler"
+
 	"github.com/gofiber/fiber/v2"
 )
 
 // Setup our router
-func SetupRoutes(app *fiber.App) {
+func SetupUserRoutes(app *fiber.App) {
 	api := app.Group("/api")
 
 	// User Group
@@ -19,7 +20,6 @@ func SetupRoutes(app *fiber.App) {
 	user.Put("/:id", handler.UpdateUser)
 	user.Delete("/:id", handler.DeleteUserByID)
 
-
 	// User Group
 	admin := api.Group("/admin")
 
@@ -29,5 +29,5 @@ func SetupRoutes(app *fiber.App) {
 	admin.Post("/", handler.CreateAdmin)
 	admin.Put("/:id", handler.UpdateAdmin)
 	admin.Delete("/:id", handler.DeleteAdminByID)
-	
+
 }
