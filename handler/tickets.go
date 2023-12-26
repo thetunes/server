@@ -3,8 +3,10 @@ package handler
 import (
 	"api/database"
 	"api/model"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	jtoken "github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 )
 
@@ -106,7 +108,7 @@ func DeleteTicket(c *fiber.Ctx) error {
 	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "Ticket deleted"})
 }
 
-// IncrementLike increments the like count for a ticket by ID
+// IncrementLike increments or decrements the like count for a ticket by ID
 func IncrementLike(c *fiber.Ctx) error {
 	db := database.DB.Db
 	// get id params
@@ -118,12 +120,43 @@ func IncrementLike(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "Ticket not found", "data": nil})
 	}
 
-	// Increment Likes
-	ticket.Likes++
+	// Extract the user information from the JWT token stored in the context
+	user := c.Locals("user").(*jtoken.Token)
+	claims := user.Claims.(jtoken.MapClaims)
+
+	// Use the 'ID' claim as the user identifier
+	userID, err := uuid.Parse(claims["ID"].(string))
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "Failed to parse user ID from token"})
+	}
+
+	// Check if the user ID is already in the likes array
+	alreadyLiked := false
+	for i, likerID := range ticket.Likers {
+		if likerID == userID.String() {
+			// User has already liked the ticket, remove their like
+			ticket.Likers = append(ticket.Likers[:i], ticket.Likers[i+1:]...)
+			alreadyLiked = true
+			break
+		}
+	}
+
+	// If the user hasn't liked the ticket, add their like
+	if !alreadyLiked {
+		ticket.Likers = append(ticket.Likers, userID.String())
+	}
 
 	// Save the Changes
 	db.Save(&ticket)
 
 	// Return the updated ticket
-	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "Like count incremented", "data": ticket})
+	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "Like count updated", "data": ticket})
+}
+
+func Protected(c *fiber.Ctx) error {
+	user := c.Locals("user").(*jtoken.Token)
+	claims := user.Claims.(jtoken.MapClaims)
+	username := claims["username"].(string)
+	// Assuming you have a "fav" claim in your JWT token
+	return c.SendString("Welcome 👋" + username)
 }

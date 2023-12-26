@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt"
+	jtoken "github.com/golang-jwt/jwt/v4"
 )
 
 func Login(c *fiber.Ctx) error {
@@ -27,13 +27,13 @@ func Login(c *fiber.Ctx) error {
 
 	day := time.Hour * 24
 
-	claims := jwt.MapClaims{
+	claims := jtoken.MapClaims{
 		"ID":       user.ID,
 		"username": user.Username,
 		"exp":      time.Now().Add(day * 1).Unix(),
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token := jtoken.NewWithClaims(jtoken.SigningMethodHS256, claims)
 
 	t, err := token.SignedString([]byte(config.Config("AUTH_SECRET")))
 	if err != nil {

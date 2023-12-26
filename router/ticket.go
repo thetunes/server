@@ -1,7 +1,9 @@
 package router
 
 import (
+	"api/config"
 	"api/handler"
+	"api/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -29,6 +31,7 @@ func SetupTicketRoutes(app *fiber.App) {
 	ticket.Delete("/:id", handler.DeleteTicket)
 
 	// Like the ticket
-	ticket.Post("/:id/like", handler.IncrementLike)
-
+	jwt := middleware.NewAuthMiddleware(config.Config("AUTH_SECRET"))
+	ticket.Post("/:id/like", jwt, handler.IncrementLike)
+	ticket.Post("/prot", jwt, handler.Protected)
 }
