@@ -15,7 +15,7 @@ type Ticket struct {
 	Date        string `json:"date"`
 	Description string `json:"description"`
 	Sold        int    `json:"sold"`
-	Likes       int    `json:"sold"`
+	Likes       int    `json:"likes" gorm:"default:0"`
 }
 
 // Users struct

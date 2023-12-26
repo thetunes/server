@@ -17,7 +17,7 @@ func SetupTicketRoutes(app *fiber.App) {
 	ticket.Get("/", handler.GetAllTicket)
 
 	// Get All by ID
-	ticket.Get("/:id", handler.GetSingleUser)
+	ticket.Get("/:id", handler.GetSingleTicket)
 
 	// Add Ticket
 	ticket.Post("/", handler.CreateTicket)
@@ -27,4 +27,8 @@ func SetupTicketRoutes(app *fiber.App) {
 
 	// Delete Ticket by ID
 	ticket.Delete("/:id", handler.DeleteTicket)
+
+	// Like the ticket
+	ticket.Post("/:id/like", handler.IncrementLike)
+
 }

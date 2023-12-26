@@ -5,22 +5,32 @@ import (
 	"api/model"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
+// Create a ticket
 // Create a ticket
 func CreateTicket(c *fiber.Ctx) error {
 	db := database.DB.Db
 	ticket := new(model.Ticket)
 
-	// Store the body in the ticket and return error if encountered
+	// Generate a random ID for the ticket
+	ticket.ID = uuid.New().String()
+
+	// Store the body in the ticket and return an error if encountered
 	err := c.BodyParser(ticket)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Something's wrong with your input", "data": err})
 	}
+
+	// Initialize Likes with 0
+	ticket.Likes = 0
+
 	err = db.Create(&ticket).Error
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Could not create ticket", "data": err})
 	}
+
 	// Return the created ticket
 	return c.Status(201).JSON(fiber.Map{"status": "success", "message": "Ticket has created", "data": ticket})
 }
@@ -94,4 +104,26 @@ func DeleteTicket(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "Failed to delete ticket", "data": nil})
 	}
 	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "Ticket deleted"})
+}
+
+// IncrementLike increments the like count for a ticket by ID
+func IncrementLike(c *fiber.Ctx) error {
+	db := database.DB.Db
+	// get id params
+	id := c.Params("id")
+	var ticket model.Ticket
+	// find single ticket in the database by id
+	db.Find(&ticket, "id = ?", id)
+	if ticket.ID == "" {
+		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "Ticket not found", "data": nil})
+	}
+
+	// Increment Likes
+	ticket.Likes++
+
+	// Save the Changes
+	db.Save(&ticket)
+
+	// Return the updated ticket
+	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "Like count incremented", "data": ticket})
 }
