@@ -3,26 +3,47 @@ package handler
 import (
 	"api/database"
 	"api/model"
+	"errors"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 // Create a user
 func CreateUser(c *fiber.Ctx) error {
 	db := database.DB.Db
 	user := new(model.User)
-	// Store the body in the user and return error if encountered
-	err := c.BodyParser(user)
-	if err != nil {
+
+	// Parse the request body into the user struct
+	if err := c.BodyParser(user); err != nil {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Something's wrong with your input", "data": err})
 	}
-	err = db.Create(&user).Error
+
+	// Check if the username is already registered
+	if isUsernameTaken(db, user.Username) {
+		return c.Status(400).JSON(fiber.Map{"status": "error", "message": "Username is already registered", "data": nil})
+	}
+
+	// Create the user
+	err := db.Create(&user).Error
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Could not create user", "data": err})
 	}
+
 	// Return the created user
-	return c.Status(201).JSON(fiber.Map{"status": "success", "message": "User has created", "data": user})
+	return c.Status(201).JSON(fiber.Map{"status": "success", "message": "User has been created", "data": user})
+}
+
+// isUsernameTaken checks if the given username is already registered.
+func isUsernameTaken(db *gorm.DB, username string) bool {
+	var existingUser model.User
+	if err := db.Where("username = ?", username).First(&existingUser).Error; err != nil {
+		// Check if the error is due to the record not being found
+		return !errors.Is(err, gorm.ErrRecordNotFound)
+	}
+	// User with the same username already exists
+	return true
 }
 
 // Get All Users from db
