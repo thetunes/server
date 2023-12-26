@@ -152,11 +152,3 @@ func IncrementLike(c *fiber.Ctx) error {
 	// Return the updated ticket
 	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "Like count updated", "data": ticket})
 }
-
-func Protected(c *fiber.Ctx) error {
-	user := c.Locals("user").(*jtoken.Token)
-	claims := user.Claims.(jtoken.MapClaims)
-	username := claims["username"].(string)
-	// Assuming you have a "fav" claim in your JWT token
-	return c.SendString("Welcome 👋" + username)
-}

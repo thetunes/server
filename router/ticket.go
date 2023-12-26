@@ -33,5 +33,4 @@ func SetupTicketRoutes(app *fiber.App) {
 	// Like the ticket
 	jwt := middleware.NewAuthMiddleware(config.Config("AUTH_SECRET"))
 	ticket.Post("/:id/like", jwt, handler.IncrementLike)
-	ticket.Post("/prot", jwt, handler.Protected)
 }
