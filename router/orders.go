@@ -1,7 +1,9 @@
 package router
 
 import (
+	"api/config"
 	"api/handler"
+	"api/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -19,7 +21,11 @@ func SetupOrdersRoutes(app *fiber.App) {
 
 	// Create Order
 	createOrder := groupOrder.Group("/create")
-	createOrder.Post("/", handler.CreateOrder)
+
+	// Like the ticket
+	jwt := middleware.NewAuthMiddleware(config.Config("AUTH_SECRET"))
+
+	createOrder.Post("/", jwt, handler.CreateOrder)
 
 	// Create Order
 	confirmOrder := groupOrder.Group("/done")

@@ -3,8 +3,10 @@ package handler
 import (
 	"api/database"
 	"api/model"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	jtoken "github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 )
 
@@ -13,21 +15,39 @@ func CreateOrder(c *fiber.Ctx) error {
 	db := database.DB.Db
 	order := new(model.TicketsOrder)
 
-	// Generate a random ID for the ticket
+	// Extract the user information from the JWT token stored in the context
+	user, ok := c.Locals("user").(*jtoken.Token)
+	if !ok || user == nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "User information not found in the context"})
+	}
+
+	// Now you can safely use the user object
+	claims := user.Claims.(jtoken.MapClaims)
+
+	// Use the 'ID' claim as the user identifier
+	userID, err := uuid.Parse(claims["ID"].(string))
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "Failed to parse user ID from token"})
+	}
+
+	// Generate a random ID for the order
 	order.ID = uuid.New().String()
 
-	// Store the body in the ticket and return an error if encountered
-	err := c.BodyParser(order)
+	// Store the body in the order and return an error if encountered
+	err = c.BodyParser(order)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Something's wrong with your input", "data": err})
 	}
+
+	// Set the UserID field with the retrieved user ID
+	order.UserID = userID.String()
 
 	err = db.Create(&order).Error
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Could not create order", "data": err})
 	}
 
-	// Return the created ticket
+	// Return the created order
 	return c.Status(201).JSON(fiber.Map{"status": "success", "message": "Order has created", "data": order})
 }
 
