@@ -20,6 +20,7 @@ func main() {
 
 	router.SetupUserRoutes(app)
 	router.SetupTicketRoutes(app)
+	router.SetupOrdersRoutes(app)
 
 	// Allow our domain to access
 	app.Use(cors.New(cors.Config{
