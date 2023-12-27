@@ -3,6 +3,7 @@ package handler
 import (
 	"api/database"
 	"api/model"
+	"encoding/json"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -130,24 +131,31 @@ func IncrementLike(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "Failed to parse user ID from token"})
 	}
 
-	// Check if the user ID is already in the likes array
-	alreadyLiked := false
-	for i, likerID := range ticket.Likers {
+	// Check if the user's UUID is already in the likers array
+	var found bool
+	for _, likerID := range ticket.Likers {
 		if likerID == userID.String() {
-			// User has already liked the ticket, remove their like
-			ticket.Likers = append(ticket.Likers[:i], ticket.Likers[i+1:]...)
-			alreadyLiked = true
+			found = true
 			break
 		}
 	}
 
-	// If the user hasn't liked the ticket, add their like
-	if !alreadyLiked {
+	// If not found, add the user's UUID to the likers array
+	if !found {
 		ticket.Likers = append(ticket.Likers, userID.String())
-	}
 
-	// Save the Changes
-	db.Save(&ticket)
+		// Marshal the Likers field to JSON
+		likersJSON, err := json.Marshal(ticket.Likers)
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Failed to marshal likers to JSON", "data": err})
+		}
+
+		// Explicitly set the Likers field in the model before saving
+		err = db.Model(&ticket).Update("Likers", likersJSON).Error
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Failed to update likers", "data": err})
+		}
+	}
 
 	// Return the updated ticket
 	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "Like count updated", "data": ticket})
