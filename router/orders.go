@@ -41,4 +41,11 @@ func SetupOrdersRoutes(app *fiber.App) {
 	deleteOrder := groupOrder.Group("/delete")
 	deleteOrder.Post("/", handler.DeleteOrder)
 
+	// Order Group
+	countOrder := api.Group("/order/count")
+
+	// Get ticket informations
+	countOrder.Get("/", handler.CountAllOrders)
+	countOrder.Get("/:userid", handler.CountOrdersForUser)
+
 }

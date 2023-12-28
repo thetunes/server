@@ -8,14 +8,13 @@ import (
 type Ticket struct {
 	gorm.Model
 	ID          string   `json:"id"`
-	ArtistID    string   `json:"artistid" gorm:"column:artistid"`
-	Title       string   `json:"title"`
-	Price       int      `json:"price"`
-	Location    string   `json:"location"`
-	Date        string   `json:"date"`
+	ArtistID    string   `json:"artistid" validate:"required"`
+	Title       string   `json:"title" validate:"required"`
+	Price       float64  `json:"price" validate:"required"`
+	Location    string   `json:"location" validate:"required"`
+	Date        string   `json:"date" validate:"required"`
 	Description string   `json:"description"`
-	Sold        int      `json:"sold"`
-	Likes       int      `json:"likes" gorm:"default:0"`
+	Likes       int      `json:"likes"`
 	Likers      []string `json:"likers" gorm:"type:uuid[]"` // Add this line
 }
 

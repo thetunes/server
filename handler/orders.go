@@ -140,3 +140,82 @@ func CancelPayment(c *fiber.Ctx) error {
 
 	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "Order status updated to false", "data": order})
 }
+
+// CountAllOrders counts the total number of orders, orders with no status, orders with true status, and orders with false status
+func CountAllOrders(c *fiber.Ctx) error {
+	db := database.DB.Db
+	var totalCount, noStatusCount, trueStatusCount, falseStatusCount int64
+
+	// Count total orders
+	err := db.Model(&model.TicketsOrder{}).Count(&totalCount).Error
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Failed to count all orders", "data": err})
+	}
+
+	// Count orders with no status
+	err = db.Model(&model.TicketsOrder{}).Where("status = ?", "").Count(&noStatusCount).Error
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Failed to count orders with no status", "data": err})
+	}
+
+	// Count orders with true status
+	err = db.Model(&model.TicketsOrder{}).Where("status = ?", "true").Count(&trueStatusCount).Error
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Failed to count orders with true status", "data": err})
+	}
+
+	// Count orders with false status
+	err = db.Model(&model.TicketsOrder{}).Where("status = ?", "false").Count(&falseStatusCount).Error
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Failed to count orders with false status", "data": err})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"status":        "success",
+		"message":       "Count of all orders",
+		"total_orders":  totalCount,
+		"nostat_orders": noStatusCount,
+		"true_orders":   trueStatusCount,
+		"false_orders":  falseStatusCount,
+	})
+}
+
+// CountOrdersForUser counts the total number of orders, orders with no status, orders with true status, and orders with false status for a specific user ID
+func CountOrdersForUser(c *fiber.Ctx) error {
+	db := database.DB.Db
+	userID := c.Params("userid")
+	var totalCount, noStatusCount, trueStatusCount, falseStatusCount int64
+
+	// Count total orders for the user
+	err := db.Model(&model.TicketsOrder{}).Where("user_id = ?", userID).Count(&totalCount).Error
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Failed to count all orders for the user", "data": err})
+	}
+
+	// Count orders with no status for the user
+	err = db.Model(&model.TicketsOrder{}).Where("user_id = ? AND status = ?", userID, "").Count(&noStatusCount).Error
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Failed to count orders with no status for the user", "data": err})
+	}
+
+	// Count orders with true status for the user
+	err = db.Model(&model.TicketsOrder{}).Where("user_id = ? AND status = ?", userID, "true").Count(&trueStatusCount).Error
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Failed to count orders with true status for the user", "data": err})
+	}
+
+	// Count orders with false status for the user
+	err = db.Model(&model.TicketsOrder{}).Where("user_id = ? AND status = ?", userID, "false").Count(&falseStatusCount).Error
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Failed to count orders with false status for the user", "data": err})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"status":        "success",
+		"message":       "Count of all orders",
+		"total_orders":  totalCount,
+		"nostat_orders": noStatusCount,
+		"true_orders":   trueStatusCount,
+		"false_orders":  falseStatusCount,
+	})
+}

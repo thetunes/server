@@ -6,13 +6,12 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/go-playground/validator"
 	"github.com/gofiber/fiber/v2"
 	jtoken "github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 )
 
-// Create a ticket
-// Create a ticket
 func CreateTicket(c *fiber.Ctx) error {
 	db := database.DB.Db
 	ticket := new(model.Ticket)
@@ -24,6 +23,12 @@ func CreateTicket(c *fiber.Ctx) error {
 	err := c.BodyParser(ticket)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Something's wrong with your input", "data": err})
+	}
+
+	// Validate the ticket data
+	validate := validator.New()
+	if err := validate.Struct(ticket); err != nil {
+		return c.Status(422).JSON(fiber.Map{"status": "error", "message": "Unprocessable Entity", "data": err})
 	}
 
 	// Initialize Likes with 0
