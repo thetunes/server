@@ -46,3 +46,22 @@ func Login(c *fiber.Ctx) error {
 		Token: t,
 	})
 }
+
+func GetUUID(c *fiber.Ctx) error {
+	user := c.Locals("user").(*jtoken.Token)
+	claims := user.Claims.(jtoken.MapClaims)
+
+	// Ensure that "ID" is used as the key to access the user ID
+	userID := claims["ID"].(string)
+
+	response := fiber.Map{
+		"status":  "success",
+		"message": "User ID found",
+		"data": fiber.Map{
+			"user_id": userID,
+		},
+	}
+
+	// Return the JSON response
+	return c.JSON(response)
+}
