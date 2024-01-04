@@ -101,7 +101,7 @@ func DeleteOrder(c *fiber.Ctx) error {
 func ConfirmPayment(c *fiber.Ctx) error {
 	db := database.DB.Db
 	// get id params
-	id := c.QueryInt("id", 0)
+	id := c.Query("id", "")
 	var order model.TicketsOrder
 	// find single order in the database by id
 	db.Find(&order, "id = ?", id)
@@ -123,7 +123,7 @@ func ConfirmPayment(c *fiber.Ctx) error {
 func CancelPayment(c *fiber.Ctx) error {
 	db := database.DB.Db
 	// get id params
-	id := c.QueryInt("id", 0)
+	id := c.Query("id", "")
 	var order model.TicketsOrder
 	// find single order in the database by id
 	db.Find(&order, "id = ?", id)
