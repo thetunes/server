@@ -31,6 +31,7 @@ func SetupUserRoutes(app *fiber.App) {
 	admin.Post("/", handler.CreateAdmin)
 	admin.Put("/:id", handler.UpdateAdmin)
 	admin.Delete("/:id", handler.DeleteAdminByID)
+	admin.Post("/auth", handler.AdminLogin)
 
 	// User Group
 	login := api.Group("/auth")
