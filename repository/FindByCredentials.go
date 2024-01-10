@@ -11,7 +11,7 @@ import (
 
 func FindByCredentials(username, password string) (*model.User, error) {
 	var user model.User
-	// Here you would query your MySQL database for the user with the given username and password
+	// Query the MySQL database for the user with the given username and password
 	result := database.DB.Db.Where("username = ? AND password = ?", username, password).First(&user)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -24,11 +24,11 @@ func FindByCredentials(username, password string) (*model.User, error) {
 
 func AdminFindByCredentials(username, password string) (*model.Admin, error) {
 	var admin model.Admin
-	// Here you would query your MySQL database for the Admin with the given username and password
+	// Query the MySQL database for the Admin with the given username and password
 	result := database.DB.Db.Where("username = ? AND password = ?", username, password).First(&admin)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return nil, errors.New("Admin not found")
+			return nil, errors.New("admin not found")
 		}
 		return nil, result.Error
 	}
