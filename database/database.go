@@ -52,7 +52,7 @@ func Connect() {
 	db.Logger = logger.Default.LogMode(logger.Info)
 
 	log.Println("Running DB Auto Migration for Admin")
-	db.AutoMigrate(&model.User{}, &model.Admin{}, &model.Ticket{})
+	db.AutoMigrate(&model.User{}, &model.Admin{}, &model.Ticket{}, &model.Promotor{})
 	DB = Dbinstance{
 		Db: db,
 	}
