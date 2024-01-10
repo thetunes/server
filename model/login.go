@@ -37,6 +37,15 @@ type Admin struct {
 	Password string    `json:"password"`
 }
 
+// Define data struct required for Promotor
+type Promotor struct {
+	gorm.Model
+	ID       uuid.UUID `gorm:"type:uuid;"`
+	Username string    `json:"username"`
+	Email    string    `json:"email"`
+	Password string    `json:"password"`
+}
+
 // Users struct
 type Users struct {
 	Users []User `json:"users"`

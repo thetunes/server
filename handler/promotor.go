@@ -3,11 +3,9 @@ package handler
 import (
 	"api/database"
 	"api/model"
-	"errors"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
 // Create a promotor
@@ -33,17 +31,6 @@ func CreatePromotor(c *fiber.Ctx) error {
 
 	// Return the created promotor
 	return c.Status(201).JSON(fiber.Map{"status": "success", "message": "Promotor has been created", "data": promotor})
-}
-
-// isusernameTaken checks if the given username is already registered.
-func isusernameTaken(db *gorm.DB, username string) bool {
-	var existingPromotor model.Promotor
-	if err := db.Where("username = ?", username).First(&existingPromotor).Error; err != nil {
-		// Check if the error is due to the record not being found
-		return !errors.Is(err, gorm.ErrRecordNotFound)
-	}
-	// Promotor with the same username already exists
-	return true
 }
 
 // Get All Promotors from db
