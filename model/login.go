@@ -46,24 +46,29 @@ type Promotor struct {
 	Password string    `json:"password"`
 }
 
-// Users struct
 type Users struct {
 	Users []User `json:"users"`
 }
 
-// Admins struct
 type Admins struct {
 	Admins []Admin `json:"admins"`
 }
 
-// BeforeCreate is a common method for generating UUID before record creation
+type Promotors struct {
+	Promotors []Promotor `json:"promotors"`
+}
+
 func (user *User) BeforeCreate(tx *gorm.DB) (err error) {
 	user.ID = uuid.New()
 	return
 }
 
-// BeforeCreate is a common method for generating UUID before record creation
 func (admin *Admin) BeforeCreate(tx *gorm.DB) (err error) {
 	admin.ID = uuid.New()
+	return
+}
+
+func (promotor *Promotor) BeforeCreate(tx *gorm.DB) (err error) {
+	promotor.ID = uuid.New()
 	return
 }
