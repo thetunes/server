@@ -2,6 +2,7 @@ package handler
 
 import (
 	"api/database"
+	userCheck "api/helper/username"
 	"api/model"
 
 	"github.com/gofiber/fiber/v2"
@@ -19,7 +20,7 @@ func CreatePromotor(c *fiber.Ctx) error {
 	}
 
 	// Check if the username is already registered
-	if isusernameTaken(db, promotor.Username) {
+	if userCheck.IsUsernameTaken(db, promotor.Username) {
 		return c.Status(400).JSON(fiber.Map{"status": "error", "message": "username is already registered", "data": nil})
 	}
 

@@ -2,12 +2,11 @@ package handler
 
 import (
 	"api/database"
+	userCheck "api/helper/username"
 	"api/model"
-	"errors"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
 // Create a user
@@ -21,7 +20,7 @@ func CreateUser(c *fiber.Ctx) error {
 	}
 
 	// Check if the username is already registered
-	if isUsernameTaken(db, user.Username) {
+	if userCheck.IsUsernameTaken(db, user.Username) {
 		return c.Status(400).JSON(fiber.Map{"status": "error", "message": "Username is already registered", "data": nil})
 	}
 
@@ -33,17 +32,6 @@ func CreateUser(c *fiber.Ctx) error {
 
 	// Return the created user
 	return c.Status(201).JSON(fiber.Map{"status": "success", "message": "User has been created", "data": user})
-}
-
-// isUsernameTaken checks if the given username is already registered.
-func isUsernameTaken(db *gorm.DB, username string) bool {
-	var existingUser model.User
-	if err := db.Where("username = ?", username).First(&existingUser).Error; err != nil {
-		// Check if the error is due to the record not being found
-		return !errors.Is(err, gorm.ErrRecordNotFound)
-	}
-	// User with the same username already exists
-	return true
 }
 
 // Get All Users from db

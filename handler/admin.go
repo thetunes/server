@@ -2,12 +2,11 @@ package handler
 
 import (
 	"api/database"
+	userCheck "api/helper/username"
 	"api/model"
-	"errors"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
 // Create a admin
@@ -21,7 +20,7 @@ func CreateAdmin(c *fiber.Ctx) error {
 	}
 
 	// Check if the username is already registered
-	if isusernameTaken(db, admin.Username) {
+	if userCheck.IsUsernameTaken(db, admin.Username) {
 		return c.Status(400).JSON(fiber.Map{"status": "error", "message": "username is already registered", "data": nil})
 	}
 
@@ -33,17 +32,6 @@ func CreateAdmin(c *fiber.Ctx) error {
 
 	// Return the created admin
 	return c.Status(201).JSON(fiber.Map{"status": "success", "message": "Admin has been created", "data": admin})
-}
-
-// isusernameTaken checks if the given username is already registered.
-func isusernameTaken(db *gorm.DB, username string) bool {
-	var existingAdmin model.Admin
-	if err := db.Where("username = ?", username).First(&existingAdmin).Error; err != nil {
-		// Check if the error is due to the record not being found
-		return !errors.Is(err, gorm.ErrRecordNotFound)
-	}
-	// Admin with the same username already exists
-	return true
 }
 
 // Get All Admins from db
