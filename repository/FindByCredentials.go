@@ -34,3 +34,16 @@ func AdminFindByCredentials(username, password string) (*model.Admin, error) {
 	}
 	return &admin, nil
 }
+
+func PromotorFindByCredentials(username, password string) (*model.Promotor, error) {
+	var promotor model.Promotor
+	// Query the MySQL database for the Promotor with the given username and password
+	result := database.DB.Db.Where("username = ? AND password = ?", username, password).First(&promotor)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, errors.New("promotor not found")
+		}
+		return nil, result.Error
+	}
+	return &promotor, nil
+}
