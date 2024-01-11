@@ -2,11 +2,13 @@ package handler
 
 import (
 	"api/database"
-	userCheck "api/helper/username"
 	"api/model"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"errors"
+
+	"gorm.io/gorm"
 )
 
 // Create a user
@@ -20,7 +22,7 @@ func CreateUser(c *fiber.Ctx) error {
 	}
 
 	// Check if the username is already registered
-	if userCheck.IsUsernameTaken(db, user.Username) {
+	if isGeneralUsernameTaken(db, user.Username) {
 		return c.Status(400).JSON(fiber.Map{"status": "error", "message": "Username is already registered", "data": nil})
 	}
 
@@ -104,4 +106,14 @@ func DeleteUserByID(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "Failed to delete user", "data": nil})
 	}
 	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "User deleted"})
+}
+
+func isGeneralUsernameTaken(db *gorm.DB, username string) bool {
+	var existingUser model.User
+	if err := db.Where("username = ?", username).First(&existingUser).Error; err != nil {
+		// Check if the error is due to the record not being found
+		return !errors.Is(err, gorm.ErrRecordNotFound)
+	}
+	// User with the same username already exists
+	return true
 }
