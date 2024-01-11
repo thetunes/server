@@ -16,6 +16,8 @@ type Ticket struct {
 	Description string   `json:"description"`
 	Likes       int      `json:"likes"`
 	Likers      []string `json:"likers" gorm:"type:uuid[]"` // Add this line
+	PromotorID  string   `json:"promotorid"`
+	Status      string   `json:"status"`
 }
 
 // Users struct
