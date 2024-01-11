@@ -25,13 +25,24 @@ func SetupUserRoutes(app *fiber.App) {
 	// User Group
 	admin := api.Group("/admin")
 
-	// User Routes
+	// Admin Routes
 	admin.Get("/", handler.GetAllAdmin)
 	admin.Get("/:id", handler.GetSingleAdmin)
 	admin.Post("/", handler.CreateAdmin)
 	admin.Put("/:id", handler.UpdateAdmin)
 	admin.Delete("/:id", handler.DeleteAdminByID)
 	admin.Post("/auth", handler.AdminLogin)
+
+	// User Group
+	promotor := api.Group("/promotor")
+
+	// Admin Routes
+	promotor.Get("/", handler.GetAllPromotor)
+	promotor.Get("/:id", handler.GetSinglePromotor)
+	promotor.Post("/", handler.CreatePromotor)
+	promotor.Put("/:id", handler.UpdatePromotor)
+	promotor.Delete("/:id", handler.DeletePromotorByID)
+	promotor.Post("/auth", handler.PromotorLogin)
 
 	// User Group
 	login := api.Group("/auth")
