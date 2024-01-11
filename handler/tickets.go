@@ -165,3 +165,25 @@ func IncrementLike(c *fiber.Ctx) error {
 	// Return the updated ticket
 	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "Like count updated", "data": ticket})
 }
+
+// Set status true if payment received
+func RemoveTicket(c *fiber.Ctx) error {
+	db := database.DB.Db
+	// get id params
+	id := c.Query("id", "")
+	var ticket model.Ticket
+	// find single ticket in the database by id
+	db.Find(&ticket, "id = ?", id)
+	if ticket.ID == "" {
+		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "Ticket not found", "data": nil})
+	}
+
+	// Update the status to true
+	ticket.Status = "false"
+	err := db.Save(&ticket).Error
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Failed to update ticket status", "data": err})
+	}
+
+	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "Ticket status updated to true", "data": ticket})
+}
