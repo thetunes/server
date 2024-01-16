@@ -48,4 +48,6 @@ func SetupOrdersRoutes(app *fiber.App) {
 	countOrder.Get("/", handler.CountAllOrders)
 	countOrder.Get("/:userid", handler.CountOrdersForUser)
 
+	// Upload payment receipt
+	groupOrder.Post("/upload/payemnt", handler.UploadPayments)
 }
