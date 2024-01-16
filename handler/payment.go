@@ -3,7 +3,10 @@ package handler
 import (
 	"api/model"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -37,4 +40,29 @@ func UploadPayments(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{"status": 201, "message": "Image uploaded successfully as" + image})
+}
+
+func GetPayment(c *fiber.Ctx) error {
+	filename := c.Query("file")
+
+	if filename == "" {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "Filename parameter is required", "data": nil})
+	}
+
+	imagePath := fmt.Sprintf("./images/%s", filename)
+
+	// Check if the file exists
+	if _, err := os.Stat(imagePath); os.IsNotExist(err) {
+		return c.Status(http.StatusNotFound).JSON(fiber.Map{"status": "error", "message": "Image not found", "data": nil})
+	}
+
+	// Read the image file
+	imageData, err := ioutil.ReadFile(imagePath)
+	if err != nil {
+		log.Println("Error reading image file:", err)
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "Server error", "data": nil})
+	}
+
+	// Return the image data as response
+	return c.Send(imageData)
 }
