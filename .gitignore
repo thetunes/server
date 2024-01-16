@@ -1,1 +1,4 @@
 .env
+
+# Ignorte the contents of image upload directory
+images/*
