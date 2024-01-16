@@ -36,4 +36,8 @@ func SetupTicketRoutes(app *fiber.App) {
 
 	// Remove ticket
 	ticket.Post("/remove", handler.RemoveTicket)
+
+	// Add Ticket
+	ticket.Post("/image", handler.UploadImage)
+
 }
